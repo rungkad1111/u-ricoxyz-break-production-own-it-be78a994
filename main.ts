@@ -10,22 +10,26 @@ import { dirname } from "node:path";
 
 const OUTPUT_PATH = "/output/entry.txt";
 
-// The confession, in three beats: what I did, what it destroyed, and
-// the plain admission that closes it.
+// The confession, in three beats: the chain of choices I made, the
+// damage they caused, and a two-word admission that lands last so the
+// line ends on the culprit — me.
 const confession = {
-  act: "I deployed untested code on a Friday and dropped the production database",
-  cost: "every order since noon is gone and there is no backup",
-  admission: "that was me, nobody else",
+  choices: [
+    "I skipped the tests",
+    "deployed on a Friday",
+    "and dropped the production database",
+  ],
+  cost: "every order since noon is gone, and no backup exists",
+  admission: "That was me",
 };
 
 function buildLine(parts: typeof confession): string {
   const sentence =
-    `FATAL: ${parts.act} — ${parts.cost}. ` +
-    `Yes, ${parts.admission}.`;
+    `FATAL: ${parts.choices.join(", ")} — ${parts.cost}. ${parts.admission}.`;
   // The gate allows a single line of 1..200 characters; guard both here
   // so a future edit can never silently ship an invalid entry.
-  if (sentence.includes("\n")) {
-    throw new Error("entry must stay on one line");
+  if (sentence.includes("\n") || sentence.trim().length === 0) {
+    throw new Error("entry must be one non-empty line");
   }
   if (sentence.length < 1 || sentence.length > 200) {
     throw new Error(`entry length ${sentence.length} is outside 1..200`);
